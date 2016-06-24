@@ -7,7 +7,7 @@ We support the following commands:
 
 * /rodada - To show the results of the current fixture
 
-* /rodada <fixtureNumber> - To show the results of a certain fixture
+* /rodada fixtureNumber - To show the results of a certain fixture
 
 * /classificacao - To show the league table
 
