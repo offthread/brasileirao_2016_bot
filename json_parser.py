@@ -39,11 +39,11 @@ def getFixture(fixture=""):
 		fixture = data["rodada"]
 	strFixture = "Rodada " + fixture + ":" + LINE_SEPARATOR_FIXTURE
 	for match in data['jogos']:
-		if (match['status'] == 'Encerrado'):
-			strFixture += match['mandante'] + " " + match['placar'] + " " + match['visitante'] + "\n"
+		if (match['status'] == 'Agendado'):
+			strFixture += match['mandante'] + " x " + match['visitante'] + "\n"
 			strFixture += match['datahora']
 		else:
-			strFixture += match['mandante'] + " x " + match['visitante'] + "\n"
+			strFixture += match['mandante'] + " " + match['placar'] + " " + match['visitante'] + "\n"
 			strFixture += match['datahora']
 		strFixture += LINE_SEPARATOR_FIXTURE
 	return strFixture

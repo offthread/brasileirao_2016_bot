@@ -9,7 +9,7 @@ import logging
 
 MIN_FIXTURES = 1
 MAX_FIXTURES = 38
-MSG_ERROR_FIXTURES = "O número da rodada deve ser um número entre 1 e 38."
+MSG_ERROR_FIXTURES = "O número da rodada deve estar no intervalo de 1 a 38."
 TOKEN = sys.argv[1]
 
 def showClassification(bot, update):
