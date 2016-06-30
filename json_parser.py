@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from bs4 import BeautifulSoup
+from datetime import date
 import urllib, urllib2, json
 import unicodedata
 
@@ -9,6 +10,8 @@ TEAMS_ABREVIATIONS = {'Palmeiras-SP':'PAL','Internacional-RS':'INT','Gremio-RS':
 'Sao Paulo-SP':'SAO','Flamengo-RJ':'FLA','Chapecoense-SC':'CHA','Santos-SP':'SAN','Atletico-PR':'CAP',\
 'Ponte Preta-SP':'PON','Fluminense-RJ':'FLU','Figueirense-SC':'FIG','Santa Cruz-PE':'STA','Atletico-MG':'CAM',\
 'Vitoria-BA':'VIT','Coritiba-PR':'CFC','Sport-PE':'SPO','Botafogo-RJ':'BOT','Cruzeiro-MG':'CRU','America-MG':'AME',}
+
+MATCH_STATUS = {'encerrados':'encerrado(s)', 'em_andamento':'em andamento', 'agendados':'agendado(s)'}
 
 LINE_SEPARATOR_FIXTURE = "\n---------------------------------------\n"
 LINE_SEPARATOR_CLASSIFICATION = "\n-----------------------\n"
@@ -34,17 +37,22 @@ def getFixture(fixture=""):
 	response = urllib.urlopen(urlFixture)
 	data = json.loads(response.read())
 	
-	matches = []
 	if (fixture == ""):
 		fixture = data["rodada"]
 	strFixture = "Rodada " + fixture + ":" + LINE_SEPARATOR_FIXTURE
 	for match in data['jogos']:
 		if (match['status'] == 'Agendado'):
 			strFixture += match['mandante'] + " x " + match['visitante'] + "\n"
-			strFixture += match['datahora']
+			strFixture += match['datahora'] + "\n"
+			strFixture += "Agendado"
+		elif (match['status'] == 'Encerrado'):
+			strFixture += match['mandante'] + " " + match['placar'] + " " + match['visitante'] + "\n"
+			strFixture += match['datahora'] + "\n"
+			strFixture += "Encerrado"
 		else:
 			strFixture += match['mandante'] + " " + match['placar'] + " " + match['visitante'] + "\n"
-			strFixture += match['datahora']
+			strFixture += match['datahora'] + "\n"
+			strFixture += "Em andamento"
 		strFixture += LINE_SEPARATOR_FIXTURE
 	return strFixture
 
@@ -77,3 +85,58 @@ def getTopScorers():
 			strikerReversed = " - ".join(strikerReversed)
 			strStrikers += strikerReversed + "\n"
 	return strStrikers
+
+def getMatchesByStatus(status):
+	urlFixture = "http://www.futebolinterior.com.br/json/Agenda/getJogos?id_ano=585&id_fase=2168&rodada=&por_grupo=1&id_grupo=-1&hash=fase%3DUnica%26rodada%3D6"
+	response = urllib.urlopen(urlFixture)
+	data = json.loads(response.read())
+
+	fixture = data["rodada"]
+
+	strFixture = "Jogo(s) " + MATCH_STATUS[status] + " da rodada " + data["rodada"] + ":" + LINE_SEPARATOR_FIXTURE
+	strInitial = strFixture
+	
+	if (status == 'encerrados'):
+		for match in data['jogos']:
+			if (match['status'] == 'Encerrado'):
+				strFixture += match['mandante'] + " " + match['placar'] + " " + match['visitante'] + "\n"
+				strFixture += match['datahora']
+				strFixture += LINE_SEPARATOR_FIXTURE
+	elif (status == 'agendados'):
+		for match in data['jogos']:
+			if (match['status'] == 'Agendado'):
+				strFixture += match['mandante'] + " x " + match['visitante'] + "\n"
+				strFixture += match['datahora'] 
+				strFixture += LINE_SEPARATOR_FIXTURE
+	else:
+		for match in data['jogos']:
+			if (match['status'] != 'Encerrado') and (match['status'] != 'Agendado'):
+				strFixture += match['mandante'] + " " + match['placar'] + " " + match['visitante'] + "\n"
+				strFixture += match['datahora']
+				strFixture += LINE_SEPARATOR_FIXTURE
+	
+	if strFixture == strInitial:
+		return  "Sem jogo(s) " + MATCH_STATUS[status] + " na rodada " + fixture
+	else:
+		return strFixture
+
+def getMatchesOfTheDay():
+	today = str(date.today().day).zfill(2) + "/" + str(date.today().month).zfill(2) + "/" + str(date.today().year)
+
+	urlFixture = "http://www.futebolinterior.com.br/json/Agenda/getJogos?id_ano=585&id_fase=2168&rodada=&por_grupo=1&id_grupo=-1&hash=fase%3DUnica%26rodada%3D6"
+	response = urllib.urlopen(urlFixture)
+	data = json.loads(response.read())
+
+	strMatches = "Jogo(s) de hoje" + LINE_SEPARATOR_FIXTURE
+	strInitial = strMatches
+
+	for match in data['jogos']:
+		if (match['datahora'].split(" ")[0] == today):
+			strMatches += match['mandante'] + " x " + match['visitante'] + "\n"
+			strMatches += match['datahora']
+			strMatches += LINE_SEPARATOR_FIXTURE
+
+	if strMatches == strInitial:
+		return  "Sem jogo(s) hoje"
+	else:
+		return strMatches

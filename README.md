@@ -13,6 +13,14 @@ We support the following commands:
 
 * /artilharia - To show the top scorers
 
+* /encerrados - To show the finished matches of the current fixture
+
+* /em_andamento - To show the ongoing matches of the current fixture
+
+* /agendados - To show the scheduled matches of the current fixture
+
+* /jogos_do_dia - To show the matches of the day
+
 ## Example of usage ##
 * /rodada 10 -> To show the results of the tenth fixture
 
