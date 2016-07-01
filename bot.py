@@ -45,7 +45,11 @@ def showHelp(bot, update):
         , reply_to_message_id=update.message['message_id'])
 
 def showMatchesByStatus(bot, update):
-	status = update.message['text'].split(" ")[0][1:]
+	arg = update.message['text'].split(" ")[0][1:]
+	if '@' in arg:
+		status = arg.split('@')[0]
+	else:
+		status = arg
 	bot.sendMessage(chat_id=update.message.chat_id, text=getMatchesByStatus(status), reply_to_message_id=update.message['message_id'])
 
 def showMatchesOfTheDay(bot, update):
