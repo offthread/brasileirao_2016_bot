@@ -13,8 +13,10 @@ TEAMS_ABREVIATIONS = {'Palmeiras-SP':'PAL','Internacional-RS':'INT','Gremio-RS':
 
 MATCH_STATUS = {'encerrados':'encerrado(s)', 'em_andamento':'em andamento', 'agendados':'agendado(s)'}
 
-LINE_SEPARATOR_FIXTURE = "\n---------------------------------------\n"
+LINE_SEPARATOR = "\n---------------------------------------\n"
 LINE_SEPARATOR_CLASSIFICATION = "\n-----------------------\n"
+
+NUMBER_OF_STRIKERS = 5
 
 def getClassification():
 	urlClassification = "http://www.futebolinterior.com.br/json/Classificacao/getClassificacao?id_ano=585&id_fase=&rodada="
@@ -39,7 +41,7 @@ def getFixture(fixture=""):
 	
 	if (fixture == ""):
 		fixture = data["rodada"]
-	strFixture = "Rodada " + fixture + ":" + LINE_SEPARATOR_FIXTURE
+	strFixture = "Rodada " + fixture + ":" + LINE_SEPARATOR
 	for match in data['jogos']:
 		if (match['status'] == 'Agendado'):
 			strFixture += match['mandante'] + " x " + match['visitante'] + "\n"
@@ -53,7 +55,7 @@ def getFixture(fixture=""):
 			strFixture += match['mandante'] + " " + match['placar'] + " " + match['visitante'] + "\n"
 			strFixture += match['datahora'] + "\n"
 			strFixture += "Em andamento"
-		strFixture += LINE_SEPARATOR_FIXTURE
+		strFixture += LINE_SEPARATOR
 	return strFixture
 
 def getTopScorers():
@@ -66,24 +68,27 @@ def getTopScorers():
 	soup = BeautifulSoup(content, 'html.parser')
 
 	divStrikers = soup.find_all("div", {"class": "col-md-8"})[2]
-	counter = 0
-	
-	strikers = divStrikers.find_all('p')[1]
-	strikers = str(strikers).replace('<p>','')
-	strikers = strikers.replace('</p>','')
-	strikers = strikers.replace('<strong>','')
-	strikers = strikers.replace('</strong>','')
-	strikers = strikers.replace('<br/>','\n')
-	strikers = strikers.split("\n")
 
-	strStrikers = "Artilheiro(s) do Brasileirão 2016:\n"
-	strStrikers += strikers[0]+"\n"
-	for i in range(len(strikers)):
-		if i > 0:
-			strikerReversed = strikers[i].split(" - ")
-			strikerReversed.reverse()
-			strikerReversed = " - ".join(strikerReversed)
-			strStrikers += strikerReversed + "\n"
+	strikersList = divStrikers.find_all('p')
+	finalStrikers = []
+
+	for i in range (1, NUMBER_OF_STRIKERS):
+		strikersList[i] = str(strikersList[i]).replace('<p>','')
+		strikersList[i] = strikersList[i].replace('</p>','')
+		strikersList[i] = strikersList[i].replace('<strong>','')
+		strikersList[i] = strikersList[i].replace('</strong>','')
+		strikersList[i] = strikersList[i].replace('<br/>','\n')
+		strikersList[i] = strikersList[i].strip()
+		if strikersList[i].endswith('\n'):
+			strikersList[i] = strikersList[i][:-2]
+		if strikersList[i] != '':
+			finalStrikers.append(strikersList[i])
+
+	strStrikers = "Artilheiros do Brasileirão 2016"
+	for i in finalStrikers:
+		strStrikers += LINE_SEPARATOR
+		strStrikers += i
+
 	return strStrikers
 
 def getMatchesByStatus(status):
@@ -93,7 +98,7 @@ def getMatchesByStatus(status):
 
 	fixture = data["rodada"]
 
-	strFixture = "Jogo(s) " + MATCH_STATUS[status] + " da rodada " + data["rodada"] + ":" + LINE_SEPARATOR_FIXTURE
+	strFixture = "Jogo(s) " + MATCH_STATUS[status] + " da rodada " + data["rodada"] + ":" + LINE_SEPARATOR
 	strInitial = strFixture
 	
 	if (status == 'encerrados'):
@@ -101,19 +106,19 @@ def getMatchesByStatus(status):
 			if (match['status'] == 'Encerrado'):
 				strFixture += match['mandante'] + " " + match['placar'] + " " + match['visitante'] + "\n"
 				strFixture += match['datahora']
-				strFixture += LINE_SEPARATOR_FIXTURE
+				strFixture += LINE_SEPARATOR
 	elif (status == 'agendados'):
 		for match in data['jogos']:
 			if (match['status'] == 'Agendado'):
 				strFixture += match['mandante'] + " x " + match['visitante'] + "\n"
 				strFixture += match['datahora'] 
-				strFixture += LINE_SEPARATOR_FIXTURE
+				strFixture += LINE_SEPARATOR
 	else:
 		for match in data['jogos']:
 			if (match['status'] != 'Encerrado') and (match['status'] != 'Agendado'):
 				strFixture += match['mandante'] + " " + match['placar'] + " " + match['visitante'] + "\n"
 				strFixture += match['datahora']
-				strFixture += LINE_SEPARATOR_FIXTURE
+				strFixture += LINE_SEPARATOR
 	
 	if strFixture == strInitial:
 		return  "Sem jogo(s) " + MATCH_STATUS[status] + " na rodada " + fixture
@@ -127,14 +132,14 @@ def getMatchesOfTheDay():
 	response = urllib.urlopen(urlFixture)
 	data = json.loads(response.read())
 
-	strMatches = "Jogo(s) de hoje" + LINE_SEPARATOR_FIXTURE
+	strMatches = "Jogo(s) de hoje" + LINE_SEPARATOR
 	strInitial = strMatches
 
 	for match in data['jogos']:
 		if (match['datahora'].split(" ")[0] == today):
 			strMatches += match['mandante'] + " x " + match['visitante'] + "\n"
 			strMatches += match['datahora']
-			strMatches += LINE_SEPARATOR_FIXTURE
+			strMatches += LINE_SEPARATOR
 
 	if strMatches == strInitial:
 		return  "Sem jogo(s) hoje"
