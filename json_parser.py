@@ -9,7 +9,8 @@ import unicodedata
 TEAMS_ABREVIATIONS = {'Palmeiras-SP':'PAL','Internacional-RS':'INT','Gremio-RS':'GRE','Corinthians-SP':'COR',\
 'Sao Paulo-SP':'SAO','Flamengo-RJ':'FLA','Chapecoense-SC':'CHA','Santos-SP':'SAN','Atletico-PR':'CAP',\
 'Ponte Preta-SP':'PON','Fluminense-RJ':'FLU','Figueirense-SC':'FIG','Santa Cruz-PE':'STA','Atletico-MG':'CAM',\
-'Vitoria-BA':'VIT','Coritiba-PR':'CFC','Sport-PE':'SPO','Botafogo-RJ':'BOT','Cruzeiro-MG':'CRU','America-MG':'AME',}
+'Vitoria-BA':'VIT','Coritiba-PR':'CFC','Sport-PE':'SPO','Botafogo-RJ':'BOT','Cruzeiro-MG':'CRU','America-MG':'AME',\
+'Atletico-MG-MG':'CAM'}
 
 MATCH_STATUS = {'encerrados':'encerrado(s)', 'em_andamento':'em andamento', 'agendados':'agendado(s)'}
 
